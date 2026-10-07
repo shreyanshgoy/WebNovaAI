@@ -65,6 +65,7 @@ const Builder = () => {
       }
     } catch (error) {
       console.error('Generation failed:', error);
+      alert(error?.message || 'Website generation failed. Check the browser console for details.');
     } finally {
       setIsGenerating(false);
       setIsGeneratingCode(false);
@@ -87,54 +88,18 @@ const Builder = () => {
       return generatedFiles;
     } catch (error) {
       console.error('Error calling index.js:', error);
-      // Fallback to simple response
-      return {
-        html: `<!DOCTYPE html>
-<html>
-<head>
-    <title>Generated Website</title>
-</head>
-<body>
-    <h1>${userPrompt}</h1>
-    <p>Website generated from your prompt: ${userPrompt}</p>
-</body>
-</html>`,
-        css: `body { font-family: Arial, sans-serif; padding: 20px; }`,
-        js: `console.log('Website generated for: ${userPrompt}');`
-      };
+      throw error;
     }
   };
 
-  // Animate code generation
+  // Show generated code immediately. Character-by-character animation
+  // made large sites take minutes and looked like generation had failed.
   const animateCodeGeneration = async (files) => {
-    const delay = 100; // Delay between each character
-    
-    // Animate HTML
-    for (let i = 0; i < files.html.length; i++) {
-      setGeneratedFiles(prev => ({
-        ...prev,
-        html: files.html.substring(0, i + 1)
-      }));
-      await new Promise(resolve => setTimeout(resolve, delay / 10));
-    }
-    
-    // Animate CSS
-    for (let i = 0; i < files.css.length; i++) {
-      setGeneratedFiles(prev => ({
-        ...prev,
-        css: files.css.substring(0, i + 1)
-      }));
-      await new Promise(resolve => setTimeout(resolve, delay / 10));
-    }
-    
-    // Animate JS
-    for (let i = 0; i < files.js.length; i++) {
-      setGeneratedFiles(prev => ({
-        ...prev,
-        js: files.js.substring(0, i + 1)
-      }));
-      await new Promise(resolve => setTimeout(resolve, delay / 10));
-    }
+    setGeneratedFiles({
+      html: files.html || '',
+      css: files.css || '',
+      js: files.js || ''
+    });
   };
 
   const handleMouseDown = (e) => {
